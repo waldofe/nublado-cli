@@ -17,7 +17,7 @@ Usage of ./nublado-cli:
 
 1. Build the binary
 
-```
+```bash
 go build nublado-cli.go
 ```
 
@@ -27,6 +27,12 @@ go build nublado-cli.go
 ### API
 
 You'll need a valid API from https://openweathermap.org/api.
+
+### Testing
+
+```bash
+OPENWEATHER_API_KEY=<api-key> go test
+```
 
 
 ### This project targets

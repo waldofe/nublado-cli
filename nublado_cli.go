@@ -28,19 +28,8 @@ type Sys struct {
 	Country string
 }
 
-func main() {
+func HumanizedWeatherMessage(input string, apiKey string) string {
 	client := &http.Client{}
-
-	apiKey := flag.String("key", "", "Provide a valid https://openweathermap.org/api API key")
-	flag.Parse()
-
-	// Validating inputs presence. Present -h if required argument is not given.
-	if *apiKey == "" {
-		flag.PrintDefaults()
-		os.Exit(1)
-	}
-
-	input := strings.Join(flag.Args(), " ")
 
 	if input == "" {
 		fmt.Println("Please, provide the name of the city.")
@@ -55,7 +44,7 @@ func main() {
 
 	// Building query params
 	query := request.URL.Query()
-	query.Add("appid", *apiKey)
+	query.Add("appid", apiKey)
 	query.Add("q", input)
 	query.Add("units", "metric")
 
@@ -83,6 +72,25 @@ func main() {
 		}
 	}
 
-	message := fmt.Sprintf("It's %v°C right now in %v, %v!", responseStruct.Main.Temp, responseStruct.Name, responseStruct.Sys.Country)
+	return fmt.Sprintf("It's %v°C right now in %v, %v!", responseStruct.Main.Temp, responseStruct.Name, responseStruct.Sys.Country)
+}
+
+func main() {
+	apiKey := flag.String("key", "", "Provide a valid https://openweathermap.org/api API key")
+	flag.Parse()
+
+	// Validating inputs presence. Present -h if required argument is not given.
+	if *apiKey == "" {
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+
+	input := strings.Join(flag.Args(), " ")
+
+	fmt.Println(input)
+	fmt.Println(*apiKey)
+
+	message := HumanizedWeatherMessage(input, *apiKey)
+
 	fmt.Println(message)
 }
