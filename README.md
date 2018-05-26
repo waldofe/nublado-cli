@@ -3,15 +3,7 @@ A Go CLI for checking weather
 
 This is a WIP project with a simple and straightforward purpose. Checking weather via CLI. You can already play with it:
 
-```bash
-› ./nublado-cli -key=<api-key> rio de janeiro
-It's 29.25°C right now in Rio de Janeiro, BR!
-
-› ./nublado-cli -h
-Usage of ./nublado-cli:
-  -key string
-    	Provide a valid https://openweathermap.org/api API key
-```
+![Example](nublado-cli-example-1.png)
 
 ### Installing
 
