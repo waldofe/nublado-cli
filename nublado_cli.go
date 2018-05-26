@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"gopkg.in/kyokomi/emoji.v1"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -14,9 +15,10 @@ import (
 const ApiUri = "http://api.openweathermap.org/data/2.5/weather"
 
 type Result struct {
-	Name string
-	Main Main
-	Sys  Sys
+	Name    string
+	Main    Main
+	Sys     Sys
+	Weather [1]Weather
 }
 
 type Main struct {
@@ -26,6 +28,36 @@ type Main struct {
 
 type Sys struct {
 	Country string
+}
+
+// "weather":[{"id":804,"main":"Clouds","description":"overcast clouds","icon":"04d"}]
+type Weather struct {
+	Description string
+	Icon        string
+}
+
+var weatherEmojiMap = map[string]string{
+	"11d": ":cloud_with_lightning:",
+	"09d": ":cloud_with_rain:",
+	"10d": ":umbrella: :cloud_with_rain:",
+	"13d": ":snowflake:",
+	// Lots of cloudy weather variations
+	"02d": ":cloud:",
+	"02n": ":cloud:",
+	"03d": ":cloud:",
+	"03n": ":cloud:",
+	"04d": ":cloud:",
+	"04n": ":cloud:",
+}
+
+func weatherEmoji(icon string) string {
+	weatherEmoji := weatherEmojiMap[icon]
+
+	if weatherEmoji != "" {
+		weatherEmoji = weatherEmoji + " "
+	}
+
+	return weatherEmoji
 }
 
 func HumanizedWeatherMessage(input string, apiKey string) string {
@@ -72,7 +104,14 @@ func HumanizedWeatherMessage(input string, apiKey string) string {
 		}
 	}
 
-	return fmt.Sprintf("It's %v°C right now in %v, %v!", responseStruct.Main.Temp, responseStruct.Name, responseStruct.Sys.Country)
+	weatherEmoji := weatherEmoji(responseStruct.Weather[0].Icon)
+
+	return emoji.Sprintf("%v, %v is under %v (%v%v°C)",
+		responseStruct.Name,
+		responseStruct.Sys.Country,
+		responseStruct.Weather[0].Description,
+		weatherEmoji,
+		responseStruct.Main.Temp)
 }
 
 func main() {
@@ -86,10 +125,6 @@ func main() {
 	}
 
 	input := strings.Join(flag.Args(), " ")
-
-	fmt.Println(input)
-	fmt.Println(*apiKey)
-
 	message := HumanizedWeatherMessage(input, *apiKey)
 
 	fmt.Println(message)
